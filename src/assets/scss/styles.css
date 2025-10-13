@@ -1,0 +1,66 @@
+.pdficon {
+  cursor: pointer;
+  color: #673AB7; 
+  border: none ;
+  background: none 
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table td {
+  color:'black';
+}
+
+.table th {
+  background-color: #f2f2f2;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.react-datepicker__month .react-datepicker__month-text, .react-datepicker__month .react-datepicker__quarter-text {
+  margin: 12px !important;
+}
+
+.react-datepicker__day--keyboard-selected:hover, .react-datepicker__month-text--keyboard-selected:hover, .react-datepicker__quarter-text--keyboard-selected:hover, .react-datepicker__year-text--keyboard-selected:hover {
+  background-color: #1e88e5 !important;
+  color: #fff !important;
+  padding: 7px !important;
+}
+
+.react-datepicker__day--keyboard-selected, .react-datepicker__month-text--keyboard-selected, .react-datepicker__quarter-text--keyboard-selected, .react-datepicker__year-text--keyboard-selected {
+  background-color: #1e88e5 !important;
+  color: #fff !important;
+  padding: 7px !important;
+}
+
+.react-datepicker__month .react-datepicker__month-text:hover {
+  background-color: #1e88e5 !important;
+  color: #fff !important;
+  padding: 0px !important;
+}
+
+/* Monthly calender - Calender Design */
+/* 
+.fc .fc-daygrid-day-number {
+  color: red !important;
+}
+
+.fc-holiday-event {
+  background-color: red !important;  
+  color: white !important;          
+}
+
+.fc-holiday-event .fc-daygrid-event-title {
+  color: white !important;
+} */
