@@ -34,15 +34,15 @@ import { Stack } from '@mui/material';
 import SnackbarAlert from "../apsara-pages/component/SnackbarAlert"
 import Loader from 'ui-component/Loader';
 import { dispatch, useSelector } from '../store/index';
-import { getCombos, addCombo, updateCombo,updateComboStockStatus } from 'redux/actions/comboActions';
-import { getProducts  } from 'redux/actions/productActions';
-
+import { addCombo } from 'redux/actions/comboActions';
+import { getProducts, updateStockStatus,updateProduct  } from 'redux/actions/productActions';
+import { getCategories } from 'redux/actions/categoryActions';
 
 
 export default function Combo() {
 
     const { products } = useSelector((data) => data.product);
-    const { combos} = useSelector((data) => data.combo);
+    const { categories } = useSelector((data) => data.category);
     const { combomessages } = useSelector((data) => data.combomessage);
 
     const [open, setOpen] = useState('')
@@ -57,13 +57,13 @@ export default function Combo() {
 
     useEffect(() => {
         dispatch(getProducts())
-        dispatch(getCombos())
+        dispatch(getCategories())
     }, []);
 
     useEffect(() => {
         addTableStatesGrid();
-        console.log("combosssss", combos);
-    }, [combos]);
+        console.log("combosssss", products);
+    }, [products]);
 
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export default function Combo() {
      const editCombos = (params) => {
         setEditOpen(true)
         setOpen(true)
-        SetEditCombo(combos.find(item => String(item.comboid) === String(params.row.id)))
+        SetEditCombo(products.find(item => String(item.productid) === String(params.row.id)))
    } 
 
    const getValidationSchema = (EditOpen) =>
@@ -108,16 +108,16 @@ export default function Combo() {
          : yup.mixed().nullable(),
      });
 
-     const handleStockToggle = (comboid, newValue) => {
+     const handleStockToggle = (productid, newValue) => {
        // Optimistic UI update
        setRows((prevRows) =>
          prevRows.map((row) =>
-           row.id === comboid ? { ...row, stockstatus: newValue } : row
+           row.id === productid ? { ...row, stockstatus: newValue } : row
          )
        );
      
        // Dispatch Redux action
-       dispatch(updateComboStockStatus(comboid, newValue)).then(() => {
+       dispatch(updateStockStatus(productid, newValue)).then(() => {
          // snackbar relies on Redux state
          if (combomessages) {
            SetSnackBarmessage({
@@ -128,14 +128,14 @@ export default function Combo() {
          }
      
          // Refresh product list
-         dispatch(getCombos());
+         dispatch(getProducts());
        });
      };
 
     const addTableStatesGrid = async () => {
         const modifiedRows = await Promise.all(
-            combos.map((row, index) => ({
-                id:  row.comboid ,
+            products.filter((row) => row.type === "combo") .map((row, index) => ({
+                id:  row.productid ,
                 sno: index + 1,
                 comboname: row.productname,
                 description: row.description,
@@ -239,6 +239,7 @@ export default function Combo() {
   const formik = useFormik({
   initialValues: {
     comboname: EditOpen ? editcombo?.productname || '' : '',
+    category: EditOpen ? editcombo?.categoryid || '' : '',
     productsname: EditOpen ? editcombo?.productids || [] : [], // array of product IDs
     description: EditOpen ? editcombo?.description || '' : '',
     photo: EditOpen ? editcombo?.photo || '' : '',
@@ -255,6 +256,7 @@ export default function Combo() {
         const payload = {
           comboname: values.comboname,
           productids: values.productsname,       // array of product IDs
+          categoryid: values.category,
           description: values.description,       // auto-generated string
           foodtype: values.foodtype,
           price: values.price,
@@ -270,11 +272,11 @@ export default function Combo() {
 
         if (EditOpen) {
           // 🔹 Edit combo
-          payload.comboid = editcombo.comboid;
-          dispatch(updateCombo(payload)).then(() => {
+          payload.productid = editcombo.productid;
+          dispatch(updateProduct(payload)).then(() => {
             setMessageAlert(true);
             setshowload(false);
-            dispatch(getCombos()); // refresh list
+            dispatch(getProducts()); // refresh list
             handleClose();
           });
         } else {
@@ -282,7 +284,7 @@ export default function Combo() {
           dispatch(addCombo(payload)).then(() => {
             setMessageAlert(true);
             setshowload(false);
-            dispatch(getCombos()); // refresh list
+            dispatch(getProducts()); // refresh list
             handleClose();
           });
         }
@@ -315,12 +317,12 @@ export default function Combo() {
 
     const handleClickOpen = () => {
         setOpen(true)
-       // setEditOpen(false)
+        setEditOpen(false)
     }
 
     const handleClose = () => {
         setOpen(false)
-       // setEditOpen(false)
+        setEditOpen(false)
     }
 
     return (
@@ -351,6 +353,39 @@ export default function Combo() {
                         <Box sx={{ flexGrow: 1, p: 2 }}>
                             <form onSubmit={formik.handleSubmit} id="validation-forms">
                             <Grid container spacing={3}>
+                                <Grid item xs={12} md={12}>
+                                    <InputLabel id="demo-simple-select-label">Category *</InputLabel>
+                                    <div className="row" style={{ marginTop: '10px' }}></div>
+                                    <FormControl
+                                        fullWidth
+                                        error={formik.touched.category && Boolean(formik.errors.category)}
+                                        >
+                                        <InputLabel id="category-label">Category *</InputLabel>
+                                        <Select
+                                            labelId="category-label"
+                                            id="category"
+                                            name="category"
+                                            value={formik.values.category}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur} // ✅ important for formik.touched
+                                            label="Category *"
+                                        >
+                                        {categories.map((row) => (
+                                            <MenuItem key={row.categoryid} value={row.categoryid}>
+                                                {row.categoryname}
+                                            </MenuItem>
+                                            ))}
+
+                                        </Select>
+
+                                        {formik.touched.category && formik.errors.category && (
+                                            <FormHelperText>
+                                            {formik.errors.category}
+                                            </FormHelperText>
+                                        )}
+                                        </FormControl>
+
+                                    </Grid>
                                 {/* Combo Name */}
                                 <Grid item xs={12}>
                                 <InputLabel>Combo Name *</InputLabel>

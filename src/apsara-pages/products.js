@@ -131,7 +131,8 @@ export default function Product() {
 
     const addTableProductGrid = async () => {
         const modifiedRows = await Promise.all(
-            products.map((row, index) => ({
+            products.filter((row) => row.type === "product") 
+            .map((row, index) => ({
                 id: row.productid,
                 sno : index+1,
                 category: row.categoryname,
@@ -280,7 +281,7 @@ export default function Product() {
         const base64Data = reader.result.split(",")[1];
         const sendingdata = {
           categoryid: values.category,
-          product: values.product,
+          products: values.product,
           foodtype: values.foodtype,
           price: values.price,
           userid: window.localStorage.getItem("userid"),
