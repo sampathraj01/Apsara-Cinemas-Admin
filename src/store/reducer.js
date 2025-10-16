@@ -20,6 +20,7 @@ import menuReducer from './slices/menu';
 import categoryReducer from '../redux/reducer/categoryReducer';
 import productReducer from '../redux/reducer/productReducer';
 import comboReducer from 'redux/reducer/comboReducer';
+import orderReducer from 'redux/reducer/orderReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -52,6 +53,9 @@ const reducer = combineReducers({
     combo: comboReducer,
     combomessage: comboReducer,
     
+    order : orderReducer,
+    singleorder : orderReducer,
+    ordermessage : orderReducer,
 });
 
 export default reducer;

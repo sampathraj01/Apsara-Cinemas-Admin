@@ -136,6 +136,7 @@ const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Category = Loadable(lazy(()=> import('apsara-pages/category')))
 const Product =  Loadable(lazy(()=> import('apsara-pages/products')))
 const Combo = Loadable(lazy(()=> import ('apsara-pages/combo')))
+const Order = Loadable(lazy(()=> import ('apsara-pages/orders')))
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -532,7 +533,10 @@ const MainRoutes = {
             path:'/apsara-pages/combo',
             element:<Combo />
         },
-        
+        {
+            path:'/apsara-pages/order',
+            element:<Order />
+        },
         
     ]
 };

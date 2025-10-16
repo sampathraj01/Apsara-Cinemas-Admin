@@ -4,7 +4,7 @@ import moment from 'moment';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-const Datefilter= ({ getReport , clearForm }) => {
+const Datefilter= ({ filter , clearForm }) => {
 
   // Formik initialization
   const formik = useFormik({
@@ -19,7 +19,7 @@ const Datefilter= ({ getReport , clearForm }) => {
         .min(Yup.ref('fromdate'), 'To Date cannot be before From Date')
     }),
     onSubmit: (values) => {
-        getReport(values)
+        filter(values)
     }
   });
 

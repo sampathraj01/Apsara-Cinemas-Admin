@@ -237,7 +237,76 @@ export default function Product() {
         setColumns(modifiedColumns);
     };
 
-    const formik = useFormik({
+//     const formik = useFormik({
+//   initialValues: {
+//     category: EditOpen ? editProduct?.categoryid || '' : '',
+//     product: EditOpen ? editProduct?.productname || '' : '',
+//     photo: EditOpen ? editProduct?.photo || '' : '',
+//     foodtype: EditOpen ? editProduct?.foodtype || '' : '',
+//     price: EditOpen ? editProduct?.price || '' : '',
+//   },
+//   validationSchema: getValidationSchema(EditOpen),
+//   enableReinitialize: true,
+//   onSubmit: async (values) => {
+//     console.log("Form Values:", values);
+
+//     if (EditOpen) {
+//       // 🔹 Edit existing product (no file upload here)
+//       const sendingdata = {
+//         productid: editProduct.productid,
+//         categoryid: values.category,
+//         product: values.product,
+//         price: values.price,
+//         foodtype: values.foodtype,
+//         userid: window.localStorage.getItem("userid"),
+//       };
+
+//       setshowload(true);
+//       dispatch(updateProduct(sendingdata)).then(() => {
+//         setMessageAlert(true);
+//         setshowload(false);
+//         dispatch(getProducts());
+//       });
+//     } else {
+//       // 🔹 Add new product (handle file upload)
+//       const file = values.photo;
+
+//       if (!file) {
+//         alert("Please select a photo");
+//         return;
+//       }
+
+//       const reader = new FileReader();
+//       reader.onloadend = async () => {
+//         const base64Data = reader.result.split(",")[1];
+//         const sendingdata = {
+//           categoryid: values.category,
+//           product: values.product,
+//           foodtype: values.foodtype,
+//           price: values.price,
+//           userid: window.localStorage.getItem("userid"),
+//           photo: {
+//             base64: base64Data,
+//             name: file.name,
+//             type: file.type,
+//           },
+//         };
+
+//         setshowload(true);
+//         dispatch(addProduct(sendingdata)).then(() => {
+//           setMessageAlert(true);
+//           setshowload(false);
+//           dispatch(getProducts());
+//         });
+//       };
+
+//       // ✅ Trigger FileReader to start
+//       reader.readAsDataURL(file);
+//     }
+//   },
+// });
+
+const formik = useFormik({
   initialValues: {
     category: EditOpen ? editProduct?.categoryid || '' : '',
     product: EditOpen ? editProduct?.productname || '' : '',
@@ -247,27 +316,55 @@ export default function Product() {
   },
   validationSchema: getValidationSchema(EditOpen),
   enableReinitialize: true,
+
   onSubmit: async (values) => {
     console.log("Form Values:", values);
 
+    const userid = window.localStorage.getItem("userid");
+
     if (EditOpen) {
-      // 🔹 Edit existing product (no file upload here)
-      const sendingdata = {
+      // ✅ If editing, allow optional photo upload
+      const file = values.photo;
+
+      let sendingdata = {
         productid: editProduct.productid,
         categoryid: values.category,
         product: values.product,
         price: values.price,
         foodtype: values.foodtype,
-        userid: window.localStorage.getItem("userid"),
+        userid,
       };
 
-      setshowload(true);
-      dispatch(updateProduct(sendingdata)).then(() => {
-        setMessageAlert(true);
-        setshowload(false);
-        dispatch(getProducts());
-      });
-    } else {
+      // ✅ If user selected a new photo, convert to base64
+      if (file && file instanceof File) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Data = reader.result.split(",")[1];
+          sendingdata.photo = {
+            base64: base64Data,
+            name: file.name,
+            type: file.type,
+          };
+
+          setshowload(true);
+          dispatch(updateProduct(sendingdata)).then(() => {
+            setMessageAlert(true);
+            setshowload(false);
+            dispatch(getProducts());
+          });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // ✅ No new photo, just update text fields
+        setshowload(true);
+        dispatch(updateProduct(sendingdata)).then(() => {
+          setMessageAlert(true);
+          setshowload(false);
+          dispatch(getProducts());
+        });
+      }
+    } 
+    else {
       // 🔹 Add new product (handle file upload)
       const file = values.photo;
 
@@ -279,12 +376,13 @@ export default function Product() {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64Data = reader.result.split(",")[1];
+
         const sendingdata = {
           categoryid: values.category,
-          products: values.product,
+          product: values.product,
           foodtype: values.foodtype,
           price: values.price,
-          userid: window.localStorage.getItem("userid"),
+          userid,
           photo: {
             base64: base64Data,
             name: file.name,
@@ -299,8 +397,6 @@ export default function Product() {
           dispatch(getProducts());
         });
       };
-
-      // ✅ Trigger FileReader to start
       reader.readAsDataURL(file);
     }
   },
